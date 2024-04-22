@@ -38,7 +38,7 @@ def unpack_all_assets(source_folder : str, destination_folder : str):
         unity_obj = UnityPy.load(os.path.join(source_folder, file_name))
         
         for obj in unity_obj.objects:
-            if obj.type.name not in ["Texture2D", "Texture2DArray"]:
+            if obj.type.name not in ["Texture2D", "Texture2DArray", "Sprite"]:
                 continue
             
             if obj.type.name == "Texture2D":
@@ -48,13 +48,21 @@ def unpack_all_assets(source_folder : str, destination_folder : str):
                     count += 1
                 except:
                     pass
-            else:
+            elif obj.type.name == "Texture2DArray":
                 for i, image in enumerate(obj.read()):
                     try:
                         image.image.save(os.path.join(destination_folder, (image.m_Name + str(i) + ".png").replace(" ", "_")))
                         count += 1
                     except:
                         pass
+            elif obj.type.name == "Sprite":
+                image = obj.read()
+                try:
+                    save_path = os.path.join(destination_folder, image.m_Name + ".png")
+                    image.image.save(save_path)
+                    count += 1
+                except:
+                    pass
     
     if len(os.listdir(destination_folder)) == 0:
         try:
